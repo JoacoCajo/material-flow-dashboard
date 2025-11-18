@@ -13,7 +13,7 @@ const Dashboard = () => {
   };
 
   const handleLoanRegistry = () => {
-    toast.info("Función: Registro de Préstamo");
+    navigate("/registro-prestamo");
   };
 
   const handleReturnEntry = () => {
