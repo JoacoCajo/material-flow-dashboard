@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import FilterSidebar from "@/components/FilterSidebar";
 import BookCard from "@/components/BookCard";
 import AddMaterialDialog from "@/components/AddMaterialDialog";
+import EditMaterialDialog from "@/components/EditMaterialDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
@@ -14,6 +15,7 @@ const MaterialManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -28,7 +30,7 @@ const MaterialManagement = () => {
   };
 
   const handleEditTitles = () => {
-    toast.info("Función: Editar títulos");
+    setIsEditDialogOpen(true);
   };
 
   const handleSearch = () => {
@@ -94,6 +96,7 @@ const MaterialManagement = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <AddMaterialDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
+      <EditMaterialDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} />
 
       <main className="container mx-auto px-6 py-8">
         <div className="flex gap-6">
