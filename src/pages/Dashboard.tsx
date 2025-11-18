@@ -51,16 +51,16 @@ const Dashboard = () => {
                 Menú
               </Button>
               
-              <div className="space-y-4">
-                <MenuButton onClick={handleAddEditMaterial}>
+              <div className="space-y-4 flex flex-col items-start">
+                <MenuButton onClick={handleAddEditMaterial} className="ml-0">
                   Añadir / editar material
                 </MenuButton>
                 
-                <MenuButton onClick={handleLoanRegistry}>
+                <MenuButton onClick={handleLoanRegistry} className="ml-8">
                   Registro de préstamo
                 </MenuButton>
                 
-                <MenuButton onClick={handleReturnEntry}>
+                <MenuButton onClick={handleReturnEntry} className="ml-16">
                   Ingreso devolución
                 </MenuButton>
               </div>
