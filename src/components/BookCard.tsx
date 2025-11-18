@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface BookCardProps {
   title: string;
@@ -8,6 +9,8 @@ interface BookCardProps {
   summary: string;
   publisher: string;
   coverImage: string;
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
 const BookCard = ({
@@ -18,9 +21,17 @@ const BookCard = ({
   summary,
   publisher,
   coverImage,
+  isSelected = false,
+  onClick,
 }: BookCardProps) => {
   return (
-    <Card className="p-6 flex gap-6 bg-card hover:shadow-lg transition-shadow">
+    <Card 
+      className={cn(
+        "p-6 flex gap-6 bg-card hover:shadow-lg transition-all cursor-pointer",
+        isSelected && "ring-4 ring-primary shadow-xl"
+      )}
+      onClick={onClick}
+    >
       <div className="flex-shrink-0">
         <img
           src={coverImage}
