@@ -16,6 +16,7 @@ const MaterialManagement = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -30,7 +31,13 @@ const MaterialManagement = () => {
   };
 
   const handleEditTitles = () => {
-    setIsEditDialogOpen(true);
+    if (selectedBookId !== null) {
+      setIsEditDialogOpen(true);
+    }
+  };
+
+  const handleBookSelect = (bookId: number) => {
+    setSelectedBookId(selectedBookId === bookId ? null : bookId);
   };
 
   const handleSearch = () => {
@@ -150,7 +157,8 @@ const MaterialManagement = () => {
               </Button>
               <Button
                 onClick={handleEditTitles}
-                className="px-6 py-3 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground"
+                disabled={selectedBookId === null}
+                className="px-6 py-3 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Editar títulos
               </Button>
@@ -168,6 +176,8 @@ const MaterialManagement = () => {
                   summary={book.summary}
                   publisher={book.publisher}
                   coverImage={book.coverImage}
+                  isSelected={selectedBookId === book.id}
+                  onClick={() => handleBookSelect(book.id)}
                 />
               ))}
 
