@@ -57,6 +57,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        header: {
+          bg: "hsl(var(--header-bg))",
+        },
+        menu: {
+          button: "hsl(var(--menu-button))",
+          foreground: "hsl(var(--menu-button-foreground))",
+        },
+        summary: {
+          bg: "hsl(var(--summary-bg))",
+        },
+        request: {
+          item: "hsl(var(--request-item))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
