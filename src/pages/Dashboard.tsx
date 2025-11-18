@@ -9,7 +9,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const handleAddEditMaterial = () => {
-    toast.info("Función: Añadir/Editar Material");
+    navigate("/gestion-material");
   };
 
   const handleLoanRegistry = () => {
