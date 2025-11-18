@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import FilterSidebar from "@/components/FilterSidebar";
 import BookCard from "@/components/BookCard";
+import AddMaterialDialog from "@/components/AddMaterialDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
@@ -12,6 +13,7 @@ const MaterialManagement = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -22,7 +24,7 @@ const MaterialManagement = () => {
   };
 
   const handleAddTitles = () => {
-    toast.success("Función: Añadir títulos");
+    setIsAddDialogOpen(true);
   };
 
   const handleEditTitles = () => {
@@ -91,6 +93,7 @@ const MaterialManagement = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <AddMaterialDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
 
       <main className="container mx-auto px-6 py-8">
         <div className="flex gap-6">
