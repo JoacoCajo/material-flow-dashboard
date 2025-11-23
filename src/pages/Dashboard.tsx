@@ -17,7 +17,7 @@ const Dashboard = () => {
   };
 
   const handleReturnEntry = () => {
-    toast.info("Función: Ingreso Devolución");
+    navigate("/ingreso-devolucion");
   };
 
   const handleViewPendingRequests = () => {
