@@ -3,7 +3,13 @@ import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search } from "lucide-react";
+import { Search, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface User {
   name: string;
@@ -29,6 +35,8 @@ const LoanRegistry = () => {
   const [isbnInput, setIsbnInput] = useState("");
   const [userData, setUserData] = useState<User | null>(null);
   const [bookData, setBookData] = useState<Book | null>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
 
   // Mock data - Simula una conexión a DB
   const mockUsers: Record<string, User> = {
@@ -98,7 +106,23 @@ const LoanRegistry = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Registro de préstamo enviado");
+    if (bookData && bookData.copies >= 1) {
+      setShowSuccessDialog(true);
+    } else {
+      setShowErrorDialog(true);
+    }
+  };
+
+  const handleCloseSuccessDialog = () => {
+    setShowSuccessDialog(false);
+    setRutInput("");
+    setIsbnInput("");
+    setUserData(null);
+    setBookData(null);
+  };
+
+  const handleCloseErrorDialog = () => {
+    setShowErrorDialog(false);
   };
 
   return (
@@ -252,6 +276,52 @@ const LoanRegistry = () => {
           </div>
         </Card>
       </main>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-md bg-card border-2 border-green-500">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold text-foreground">
+              Préstamo Registrado
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-6 space-y-4">
+            <CheckCircle2 className="w-20 h-20 text-green-500" />
+            <p className="text-center text-lg text-foreground">
+              El préstamo ha sido registrado correctamente
+            </p>
+            <Button
+              onClick={handleCloseSuccessDialog}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 mt-4"
+            >
+              Aceptar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Error Dialog */}
+      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <DialogContent className="sm:max-w-md bg-card border-2 border-red-500">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold text-foreground">
+              Error en el Préstamo
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-6 space-y-4">
+            <XCircle className="w-20 h-20 text-red-500" />
+            <p className="text-center text-lg text-foreground">
+              No hay existencias disponibles de este material
+            </p>
+            <Button
+              onClick={handleCloseErrorDialog}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 mt-4"
+            >
+              Aceptar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
