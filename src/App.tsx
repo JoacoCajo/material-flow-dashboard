@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 const PendingRequests = lazy(() => import("./pages/PendingRequests"));
 const MaterialManagement = lazy(() => import("./pages/MaterialManagement"));
 const LoanRegistry = lazy(() => import("./pages/LoanRegistry"));
+const ReturnEntry = lazy(() => import("./pages/ReturnEntry"));
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/solicitudes-pendientes" element={<PendingRequests />} />
             <Route path="/gestion-material" element={<MaterialManagement />} />
             <Route path="/registro-prestamo" element={<LoanRegistry />} />
+            <Route path="/ingreso-devolucion" element={<ReturnEntry />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
