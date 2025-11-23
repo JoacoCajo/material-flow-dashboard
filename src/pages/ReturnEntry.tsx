@@ -3,7 +3,13 @@ import Header from "@/components/Header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search } from "lucide-react";
+import { Search, CheckCircle2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface LoanRecord {
   isbn: string;
@@ -27,6 +33,7 @@ interface LoanRecord {
 const ReturnEntry = () => {
   const [isbnInput, setIsbnInput] = useState("");
   const [loanData, setLoanData] = useState<LoanRecord | null>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   // Mock data - Simula préstamos activos
   const mockActiveLoans: Record<string, LoanRecord> = {
@@ -78,7 +85,13 @@ const ReturnEntry = () => {
   };
 
   const handleSubmit = () => {
-    console.log("Devolución registrada");
+    setShowSuccessDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setShowSuccessDialog(false);
+    setIsbnInput("");
+    setLoanData(null);
   };
 
   return (
@@ -220,6 +233,29 @@ const ReturnEntry = () => {
           </div>
         </Card>
       </main>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="sm:max-w-md bg-card border-2 border-primary">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold text-foreground">
+              Devolución Exitosa
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center py-6 space-y-4">
+            <CheckCircle2 className="w-20 h-20 text-green-500" />
+            <p className="text-center text-lg text-foreground">
+              El material ha sido devuelto correctamente
+            </p>
+            <Button
+              onClick={handleCloseDialog}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 mt-4"
+            >
+              Aceptar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
