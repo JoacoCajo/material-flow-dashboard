@@ -17,6 +17,9 @@ interface AddMaterialDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+// Usa la URL configurada o, por defecto, el backend en 8009
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
+
 const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -27,20 +30,86 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
     summary: "",
     cover: null as File | null,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Material añadido exitosamente");
-    onOpenChange(false);
-    setFormData({
-      title: "",
-      author: "",
-      year: "",
-      isbn: "",
-      quantity: "",
-      summary: "",
-      cover: null,
-    });
+    const normalizedTitle = formData.title.trim();
+    if (!normalizedTitle) {
+      toast.error("El título es obligatorio");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Verificar si ya existe un título igual en la BD
+      const searchResponse = await fetch(
+        `${API_BASE_URL}/catalogo/buscar/?q=${encodeURIComponent(normalizedTitle)}&page=1&size=5`
+      );
+
+      if (!searchResponse.ok) {
+        throw new Error("No se pudo validar si el título existe en la BD");
+      }
+
+      const searchData = await searchResponse.json();
+      const titleExists = Array.isArray(searchData?.items)
+        ? searchData.items.some(
+            (item: { titulo?: string }) =>
+              item?.titulo?.toLowerCase() === normalizedTitle.toLowerCase()
+          )
+        : false;
+
+      if (titleExists) {
+        toast.warning("Ya existe un título con ese nombre en la base de datos");
+        return;
+      }
+
+      const payload = {
+        tipo: "libro",
+        titulo: normalizedTitle,
+        autor: formData.author.trim(),
+        editorial: undefined,
+        anio:
+          formData.year && !Number.isNaN(Number(formData.year))
+            ? Number(formData.year)
+            : undefined,
+        edicion: formData.isbn || undefined,
+        categoria: undefined,
+        tipo_medio: "fisico",
+      };
+
+      const response = await fetch(`${API_BASE_URL}/documentos/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        throw new Error(errorBody?.detail || "No se pudo guardar el material");
+      }
+
+      toast.success("Material añadido exitosamente");
+      onOpenChange(false);
+      setFormData({
+        title: "",
+        author: "",
+        year: "",
+        isbn: "",
+        quantity: "",
+        summary: "",
+        cover: null,
+      });
+    } catch (error) {
+      console.error("Error al guardar el material", error);
+      const message = error instanceof Error ? error.message : "Ocurrió un error inesperado";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -174,9 +243,10 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
           <div className="flex justify-center pt-4">
             <Button
               type="submit"
-              className="px-8 py-3 bg-menu-button hover:bg-menu-button/90 text-menu-foreground rounded-xl font-medium"
+              disabled={isSubmitting}
+              className="px-8 py-3 bg-menu-button hover:bg-menu-button/90 text-menu-foreground rounded-xl font-medium disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Confirmar Solicitud
+              {isSubmitting ? "Guardando..." : "Solicitud"}
             </Button>
           </div>
         </form>
