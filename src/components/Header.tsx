@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, LogOut, Shield, Loader2 } from "lucide-react";
+import { BookOpen, LogOut, Shield, Loader2, BookMarked } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -13,7 +13,6 @@ import { toast } from "sonner";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { clearToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-
 const Header = () => {
   const navigate = useNavigate();
   const { data: user, isLoading } = useAuthUser();
@@ -87,6 +86,12 @@ const Header = () => {
               <DropdownMenuItem onClick={() => navigate("/admin")}>
                 <Shield className="mr-2 h-4 w-4" />
                 Opciones de administrador
+              </DropdownMenuItem>
+            )}
+            {!isAdmin && (
+              <DropdownMenuItem onClick={() => navigate("/mis-prestamos")}>
+                <BookMarked className="mr-2 h-4 w-4" />
+                Mis préstamos
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">

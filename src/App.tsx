@@ -13,6 +13,7 @@ const LoanRegistry = lazy(() => import("./pages/LoanRegistry"));
 const BookFilterSearch = lazy(() => import("./pages/BookFilterSearch"));
 const ReturnEntry = lazy(() => import("./pages/ReturnEntry"));
 const Auth = lazy(() => import("./pages/Auth"));
+const MyLoans = lazy(() => import("./pages/MyLoans"));
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/registro-prestamo" element={<LoanRegistry />} />
             <Route path="/ingreso-devolucion" element={<ReturnEntry />} />
             <Route path="/busqueda-filtros" element={<BookFilterSearch />} />
+            <Route path="/mis-prestamos" element={<MyLoans />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
