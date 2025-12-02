@@ -28,7 +28,13 @@ const Header = () => {
     clearToken();
     setMenuOpen(false);
     toast.success("Sesión cerrada");
-    navigate("/");
+    navigate("/auth");
+  };
+
+  const handleUserClick = () => {
+    if (!user) {
+      navigate("/auth");
+    }
   };
 
   return (
@@ -47,7 +53,8 @@ const Header = () => {
         <DropdownMenuTrigger asChild>
           <button
             className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-            onMouseEnter={() => setMenuOpen(true)}
+            onClick={handleUserClick}
+            onMouseEnter={() => user && setMenuOpen(true)}
             onMouseLeave={() => setMenuOpen(false)}
           >
             <div className="text-sm text-foreground text-right">
