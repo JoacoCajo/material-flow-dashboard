@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 const PendingRequests = lazy(() => import("./pages/PendingRequests"));
 const MaterialManagement = lazy(() => import("./pages/MaterialManagement"));
 const LoanRegistry = lazy(() => import("./pages/LoanRegistry"));
+const BookFilterSearch = lazy(() => import("./pages/BookFilterSearch"));
 const ReturnEntry = lazy(() => import("./pages/ReturnEntry"));
 const Auth = lazy(() => import("./pages/Auth"));
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/gestion-material" element={<MaterialManagement />} />
             <Route path="/registro-prestamo" element={<LoanRegistry />} />
             <Route path="/ingreso-devolucion" element={<ReturnEntry />} />
+            <Route path="/busqueda-filtros" element={<BookFilterSearch />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

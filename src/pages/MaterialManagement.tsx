@@ -6,9 +6,10 @@ import AddMaterialDialog from "@/components/AddMaterialDialog";
 import EditMaterialDialog from "@/components/EditMaterialDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import { Search, X, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
 
@@ -35,6 +36,7 @@ const MaterialManagement = () => {
   const [loadingDocs, setLoadingDocs] = useState(false);
   const { data: user } = useAuthUser();
   const isAdmin = user?.rol === "admin";
+  const navigate = useNavigate();
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -177,6 +179,14 @@ const MaterialManagement = () => {
                 variant="default"
               >
                 Buscar
+              </Button>
+              <Button
+                onClick={() => navigate("/busqueda-filtros")}
+                variant="outline"
+                className="px-6 py-6 rounded-xl"
+              >
+                <Filter className="w-5 h-5 mr-2" />
+                Filtros avanzados
               </Button>
             </div>
 
