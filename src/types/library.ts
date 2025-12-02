@@ -32,6 +32,7 @@ export interface LoanRecord {
   bookYear: number;
   bookGenre: string;
   bookCover: string;
+  copies?: number;
   userName: string;
   userRut: string;
   userAddress: string;

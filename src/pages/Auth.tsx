@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen, Loader2 } from "lucide-react";
+import { BookOpen, Loader2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { login as loginApi, registerUser } from "@/lib/auth";
 import libraryBackground from "@/assets/library-background.jpg";
@@ -75,9 +75,17 @@ const Auth = () => {
 
   return (
     <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center"
+      className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center relative"
       style={{ backgroundImage: `url(${libraryBackground})` }}
     >
+      <Button
+        variant="outline"
+        onClick={() => navigate("/")}
+        className="absolute top-6 left-6 bg-card/90 hover:bg-card"
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Volver al inicio
+      </Button>
       <main className="container mx-auto px-6 py-12 flex items-center justify-center">
         <Card className="w-full max-w-md p-8 bg-card">
           {/* Icon */}
