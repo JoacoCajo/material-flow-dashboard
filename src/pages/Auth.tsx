@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { login as loginApi, registerUser } from "@/lib/auth";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -14,8 +15,12 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [rut, setRut] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
@@ -24,16 +29,48 @@ const Auth = () => {
     }
 
     if (activeTab === "register") {
+      if (!rut.trim() || !firstName.trim() || !lastName.trim()) {
+        toast.error("Completa RUT, nombres y apellidos");
+        return;
+      }
       if (password !== confirmPassword) {
         toast.error("Las contraseñas no coinciden");
         return;
       }
-      toast.success("Cuenta creada exitosamente");
-    } else {
-      toast.success("Inicio de sesión exitoso");
+
+      try {
+        setLoading(true);
+        await registerUser({
+          rut: rut.trim(),
+          nombres: firstName.trim(),
+          apellidos: lastName.trim(),
+          email: email.trim(),
+          password,
+          rol: "usuario",
+        });
+        toast.success("Cuenta creada exitosamente. Inicia sesión para continuar.");
+        setActiveTab("login");
+        return;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "No se pudo registrar";
+        toast.error(msg);
+        return;
+      } finally {
+        setLoading(false);
+      }
     }
 
-    navigate("/");
+    try {
+      setLoading(true);
+      await loginApi(email.trim(), password);
+      toast.success("Inicio de sesión exitoso");
+      navigate("/");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "No se pudo iniciar sesión";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -83,6 +120,38 @@ const Auth = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+            {activeTab === "register" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="rut">RUT</Label>
+                  <Input
+                    id="rut"
+                    placeholder="12345678-9"
+                    value={rut}
+                    onChange={(e) => setRut(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Nombres</Label>
+                  <Input
+                    id="firstName"
+                    placeholder="Nombres"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Apellidos</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Apellidos"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email">Correo electrónico</Label>
               <Input
@@ -116,8 +185,21 @@ const Auth = () => {
               </div>
             )}
 
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-              {activeTab === "login" ? "Iniciar Sesión" : "Registrarse"}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground disabled:opacity-60"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Cargando...
+                </span>
+              ) : activeTab === "login" ? (
+                "Iniciar Sesión"
+              ) : (
+                "Registrarse"
+              )}
             </Button>
           </form>
         </Card>

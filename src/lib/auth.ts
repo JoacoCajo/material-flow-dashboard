@@ -36,6 +36,28 @@ export async function login(email: string, password: string) {
   return data;
 }
 
+export async function registerUser(payload: {
+  rut: string;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  password: string;
+  rol?: string;
+}) {
+  const res = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail || "No se pudo registrar el usuario");
+  }
+
+  return res.json();
+}
+
 export async function fetchCurrentUser(): Promise<CurrentUser | null> {
   const token = getToken();
   if (!token) return null;
