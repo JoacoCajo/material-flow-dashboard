@@ -8,7 +8,7 @@ interface BookCardProps {
   availability: string;
   summary: string;
   publisher: string;
-  coverImage: string;
+  coverImage?: string;
   isSelected?: boolean;
   onClick?: () => void;
 }
@@ -24,6 +24,8 @@ const BookCard = ({
   isSelected = false,
   onClick,
 }: BookCardProps) => {
+  const hasCover = Boolean(coverImage);
+
   return (
     <Card 
       className={cn(
@@ -33,11 +35,15 @@ const BookCard = ({
       onClick={onClick}
     >
       <div className="flex-shrink-0">
-        <img
-          src={coverImage}
-          alt={`Portada de ${title}`}
-          className="w-32 h-48 object-cover rounded-lg shadow-md"
-        />
+        {hasCover ? (
+          <img
+            src={coverImage}
+            alt={`Portada de ${title}`}
+            className="w-32 h-48 object-cover rounded-lg shadow-md"
+          />
+        ) : (
+          <div className="w-32 h-48 rounded-lg bg-muted shadow-inner" />
+        )}
       </div>
       <div className="flex-1 space-y-2">
         <div>
@@ -47,7 +53,7 @@ const BookCard = ({
           <p className="text-sm font-medium text-foreground mt-1">{availability}</p>
         </div>
         <div>
-          <p className="text-sm font-semibold text-foreground mb-1">Reseña:</p>
+          <p className="text-sm font-semibold text-foreground mb-1">Resumen:</p>
           <p className="text-sm text-muted-foreground leading-relaxed">{summary}</p>
           <p className="text-xs text-muted-foreground mt-2">Editorial: {publisher}</p>
         </div>

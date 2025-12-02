@@ -7,30 +7,90 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { X, Link as LinkIcon } from "lucide-react";
+import { X } from "lucide-react";
 import { toast } from "sonner";
 
 interface EditMaterialDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  document?: {
+    id: number;
+    titulo: string;
+    autor: string;
+    anio?: number | null;
+    edicion?: string | null;
+    categoria?: string | null;
+  } | null;
+  onUpdated?: (updated: any) => void;
 }
 
-const EditMaterialDialog = ({ open, onOpenChange }: EditMaterialDialogProps) => {
+const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMaterialDialogProps) => {
   const [formData, setFormData] = useState({
-    title: "Los Juegos del hambre",
-    author: "Suzanne collins",
-    year: "2008",
-    isbn: "13019481512",
-    quantity: "3",
-    summary: "En una oscura versión del futuro próximo, doce chicos y doce chicas se ven obligados a participar en un reality show llamado Los Juegos del Hambre. Sólo hay una regla: matar o morir. Cuando Katniss Everdeen, una joven de dieciséis años, se presenta voluntaria para ocupar el lugar de su hermana en los juegos, lo entiende como una condena a muerte. Sin embargo, Katniss ya ha visto la muerte de cerca; y la supervivencia forma parte de su naturaleza.",
+    title: "",
+    author: "",
+    year: "",
+    isbn: "",
+    quantity: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (document) {
+      setFormData({
+        title: document.titulo || "",
+        author: document.autor || "",
+        year: document.anio ? String(document.anio) : "",
+        isbn: document.edicion || "",
+        quantity: document.existencias ? String(document.existencias) : "",
+      });
+    }
+  }, [document]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Material actualizado exitosamente");
-    onOpenChange(false);
+    if (!document) return;
+
+    setIsSubmitting(true);
+    try {
+      const payload: Record<string, any> = {
+        titulo: formData.title.trim(),
+        autor: formData.author.trim(),
+        anio:
+          formData.year && !Number.isNaN(Number(formData.year))
+            ? Number(formData.year)
+            : undefined,
+        edicion: formData.isbn || undefined,
+      };
+      if (formData.quantity && !Number.isNaN(Number(formData.quantity))) {
+        payload.existencias = Number(formData.quantity);
+      }
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1"}/documentos/${document.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        throw new Error(err?.detail || "No se pudo actualizar el material");
+      }
+
+      const updated = await res.json();
+      toast.success("Material actualizado exitosamente");
+      onUpdated?.(updated);
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error al actualizar material", error);
+      const msg = error instanceof Error ? error.message : "Error al actualizar";
+      toast.error(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -114,44 +174,16 @@ const EditMaterialDialog = ({ open, onOpenChange }: EditMaterialDialogProps) => 
               value={formData.quantity}
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
               className="bg-primary/10 border-0 rounded-xl"
-              required
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-summary" className="text-sm font-medium">
-              Resumen
-            </Label>
-            <Textarea
-              id="edit-summary"
-              value={formData.summary}
-              onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-              className="bg-primary/10 border-0 rounded-xl min-h-[150px] resize-none"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="edit-cover" className="text-sm font-medium">
-              Editar Portada
-            </Label>
-            <div className="flex items-center gap-3">
-              <Button
-                type="button"
-                variant="ghost"
-                className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-xl hover:bg-primary/20"
-              >
-                <LinkIcon className="w-4 h-4" />
-              </Button>
-            </div>
           </div>
 
           <div className="flex justify-center pt-4">
             <Button
               type="submit"
-              className="px-8 py-3 bg-menu-button hover:bg-menu-button/90 text-menu-foreground rounded-xl font-medium"
+              disabled={isSubmitting || !document}
+              className="px-8 py-3 bg-menu-button hover:bg-menu-button/90 text-menu-foreground rounded-xl font-medium disabled:opacity-60"
             >
-              Confirmar Solicitud
+              {isSubmitting ? "Guardando..." : "Confirmar Solicitud"}
             </Button>
           </div>
         </form>

@@ -23,7 +23,8 @@ const App = () => (
       <BrowserRouter>
         <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Cargando...</div>}>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route path="/" element={<MaterialManagement />} />
+            <Route path="/admin" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/solicitudes-pendientes" element={<PendingRequests />} />
             <Route path="/gestion-material" element={<MaterialManagement />} />

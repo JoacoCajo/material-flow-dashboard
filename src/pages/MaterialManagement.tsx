@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import FilterSidebar from "@/components/FilterSidebar";
 import BookCard from "@/components/BookCard";
@@ -8,8 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
 import { toast } from "sonner";
-import { mockCatalogBooks } from "@/data/mockData";
 import { useAuthUser } from "@/hooks/useAuthUser";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
+
+type DocumentItem = {
+  id: number;
+  titulo: string;
+  autor: string;
+  anio?: number | null;
+  categoria?: string | null;
+  editorial?: string | null;
+  resumen?: string | null;
+  tipo?: string | null;
+  tipo_medio?: string | null;
+  existencias?: number | null;
+  };
 
 const MaterialManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -17,6 +31,8 @@ const MaterialManagement = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
+  const [documents, setDocuments] = useState<DocumentItem[]>([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
   const { data: user } = useAuthUser();
   const isAdmin = user?.rol === "admin";
 
@@ -42,31 +58,85 @@ const MaterialManagement = () => {
     setSelectedBookId(selectedBookId === bookId ? null : bookId);
   };
 
-  const handleSearch = () => {
-    toast.info(`Buscando: ${searchQuery}`);
+  const handleSearch = async () => {
+    const term = searchQuery.trim();
+    if (!term) {
+      toast.error("Ingresa un término de búsqueda");
+      return;
+    }
+    setLoadingDocs(true);
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/catalogo/buscar/?q=${encodeURIComponent(term)}&page=1&size=50`
+      );
+      if (!res.ok) {
+        throw new Error("No se pudo buscar en el catálogo");
+      }
+      const data = await res.json();
+      setDocuments(Array.isArray(data?.items) ? data.items : []);
+    } catch (error) {
+      console.error("Error en búsqueda", error);
+      toast.error("No se pudo realizar la búsqueda");
+    } finally {
+      setLoadingDocs(false);
+    }
   };
 
   const clearSearch = () => {
     setSearchQuery("");
   };
 
-  const filteredBooks = mockCatalogBooks.filter((book) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase());
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      setLoadingDocs(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/documentos/?page=1&size=100`);
+        if (!res.ok) {
+          throw new Error("No se pudieron obtener los documentos");
+        }
+        const data = await res.json();
+        setDocuments(Array.isArray(data?.items) ? data.items : []);
+      } catch (error) {
+        console.error("Error al cargar documentos", error);
+        toast.error("No se pudieron cargar los materiales");
+      } finally {
+        setLoadingDocs(false);
+      }
+    };
 
-    const matchesCategory =
-      selectedCategories.length === 0 || selectedCategories.includes(book.category || "");
+    fetchDocuments();
+  }, []);
 
-    return matchesSearch && matchesCategory;
-  });
+  const filteredBooks = useMemo(() => {
+    return documents.filter((doc) => {
+      const search = searchQuery.toLowerCase();
+      const matchesSearch =
+        search === "" ||
+        doc.titulo.toLowerCase().includes(search) ||
+        doc.autor.toLowerCase().includes(search);
+
+      const matchesCategory =
+        selectedCategories.length === 0 ||
+        (doc.categoria ? selectedCategories.includes(doc.categoria) : false);
+
+      return matchesSearch && matchesCategory;
+    });
+  }, [documents, searchQuery, selectedCategories]);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <AddMaterialDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
-      <EditMaterialDialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen} />
+      <EditMaterialDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        document={documents.find((doc) => doc.id === selectedBookId) || null}
+        onUpdated={(updated) => {
+          setDocuments((prev) =>
+            prev.map((d) => (d.id === updated.id ? updated : d))
+          );
+        }}
+      />
 
       <main className="container mx-auto px-6 py-8">
         <div className="flex gap-6">
@@ -103,8 +173,8 @@ const MaterialManagement = () => {
               </div>
               <Button
                 onClick={handleSearch}
-                className="px-8 py-6 rounded-xl bg-card hover:bg-card/90 text-foreground border border-border"
-                variant="outline"
+                className="px-8 py-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white"
+                variant="default"
               >
                 Buscar
               </Button>
@@ -131,22 +201,34 @@ const MaterialManagement = () => {
 
             {/* Lista de libros */}
             <div className="space-y-6">
-              {filteredBooks.map((book) => (
+              {loadingDocs && (
+                <div className="text-center py-12 text-muted-foreground">Cargando materiales...</div>
+              )}
+
+              {!loadingDocs && filteredBooks.map((book) => (
                 <BookCard
                   key={book.id}
-                  title={book.title}
-                  author={book.author}
-                  year={book.year}
-                  availability={book.availability || ""}
-                  summary={book.summary || ""}
-                  publisher={book.publisher || ""}
-                  coverImage={book.coverImage}
+                  title={book.titulo}
+                  author={book.autor}
+                  year={book.anio || 0}
+                  availability={
+                    book.existencias != null
+                      ? `${book.existencias} existencias`
+                      : book.tipo_medio || "Disponible"
+                  }
+                  summary={
+                    book.resumen && book.resumen.trim().length > 0
+                      ? book.resumen
+                      : "Sin resumen"
+                  }
+                  publisher={book.editorial || "Sin editorial"}
+                  coverImage={undefined}
                   isSelected={selectedBookId === book.id}
                   onClick={() => handleBookSelect(book.id!)}
                 />
               ))}
 
-              {filteredBooks.length === 0 && (
+              {!loadingDocs && filteredBooks.length === 0 && (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">
                     No se encontraron libros con los criterios seleccionados

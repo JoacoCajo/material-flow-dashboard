@@ -35,7 +35,7 @@ const Header = () => {
 
   return (
     <header className="bg-header-bg shadow-sm px-6 py-4 flex items-center justify-between">
-      <Link to="/gestion-material" className="flex items-center gap-3 group">
+      <Link to="/" className="flex items-center gap-3 group">
         <BookOpen
           className="w-10 h-10 text-primary group-hover:scale-105 transition-transform"
           strokeWidth={1.5}

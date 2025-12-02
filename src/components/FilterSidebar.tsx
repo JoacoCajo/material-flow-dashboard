@@ -8,11 +8,15 @@ interface FilterSidebarProps {
 
 const FilterSidebar = ({ selectedCategories, onCategoryChange }: FilterSidebarProps) => {
   const categories = [
-    "Aventura",
-    "Ciencia-ficción",
-    "Literatura",
-    "Cómics",
-    "Novelas",
+    "literatura_chilena",
+    "tecnico_español",
+    "novela",
+    "ciencia_ficcion",
+    "historia",
+    "infantil",
+    "accion",
+    "guerra",
+    "romance",
   ];
 
   return (

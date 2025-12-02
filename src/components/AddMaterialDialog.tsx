@@ -28,7 +28,9 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
     isbn: "",
     quantity: "",
     summary: "",
+    editorial: "",
     cover: null as File | null,
+    category: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -65,18 +67,25 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
         return;
       }
 
+      const quantityNumber =
+        formData.quantity && !Number.isNaN(Number(formData.quantity))
+          ? Number(formData.quantity)
+          : undefined;
+
       const payload = {
         tipo: "libro",
         titulo: normalizedTitle,
         autor: formData.author.trim(),
-        editorial: undefined,
+        editorial: formData.editorial || undefined,
+        resumen: formData.summary || undefined,
         anio:
           formData.year && !Number.isNaN(Number(formData.year))
             ? Number(formData.year)
             : undefined,
         edicion: formData.isbn || undefined,
-        categoria: undefined,
+        categoria: formData.category || undefined,
         tipo_medio: "fisico",
+        existencias: quantityNumber,
       };
 
       const response = await fetch(`${API_BASE_URL}/documentos/`, {
@@ -102,6 +111,8 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
         quantity: "",
         summary: "",
         cover: null,
+        editorial: "",
+        category: "",
       });
     } catch (error) {
       console.error("Error al guardar el material", error);
@@ -163,6 +174,42 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="editorial" className="text-sm font-medium">
+              Editorial
+            </Label>
+            <Input
+              id="editorial"
+              value={formData.editorial}
+              onChange={(e) => setFormData({ ...formData, editorial: e.target.value })}
+              className="bg-primary/10 border-0 rounded-xl"
+              placeholder="Ej: Planeta"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category" className="text-sm font-medium">
+              Categoría
+            </Label>
+            <select
+              id="category"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full bg-primary/10 border-0 rounded-xl px-3 py-3 text-sm text-foreground"
+            >
+              <option value="">Sin categoría</option>
+              <option value="literatura_chilena">Literatura chilena</option>
+              <option value="tecnico_español">Técnico español</option>
+              <option value="novela">Novela</option>
+              <option value="ciencia_ficcion">Ciencia ficción</option>
+              <option value="historia">Historia</option>
+              <option value="infantil">Infantil</option>
+              <option value="accion">Acción</option>
+              <option value="guerra">Guerra</option>
+              <option value="romance">Romance</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="year" className="text-sm font-medium">
               Año publicación
             </Label>
@@ -199,8 +246,7 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
               value={formData.quantity}
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
               className="bg-primary/10 border-0 rounded-xl"
-              placeholder="Autogenerado en la base de datos"
-              disabled
+              required
             />
           </div>
 
