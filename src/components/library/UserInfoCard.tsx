@@ -33,10 +33,8 @@ const UserInfoCard = ({ user, className = "" }: UserInfoCardProps) => {
           <p className="text-sm text-foreground">{user.name}</p>
           <p className="font-semibold text-sm text-foreground mt-2">Rut:</p>
           <p className="text-sm text-foreground">{user.rut}</p>
-          <p className="font-semibold text-sm text-foreground mt-2">Dirección:</p>
+          <p className="font-semibold text-sm text-foreground mt-2">Correo:</p>
           <p className="text-sm text-foreground">{user.address}</p>
-          <p className="font-semibold text-sm text-foreground mt-2">Teléfono:</p>
-          <p className="text-sm text-foreground">{user.phone}</p>
         </div>
         <div className="bg-amber-200 rounded p-3">
           <p className="font-semibold text-sm text-foreground">Faltas</p>

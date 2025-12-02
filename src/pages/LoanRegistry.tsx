@@ -17,12 +17,13 @@ const LoanRegistry = () => {
   const [loadingRut, setLoadingRut] = useState(false);
   const [loadingIsbn, setLoadingIsbn] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
   const mapUserResponseToCard = (data: any): User => ({
     name: `${data.nombres ?? ""} ${data.apellidos ?? ""}`.trim() || data.email || "Usuario",
     rut: data.rut ?? rutInput,
     address: data.email ?? "Sin email registrado",
-    phone: data.rol ? `Rol: ${data.rol}` : "Teléfono no disponible",
+    phone: data.rol ? `Rol: ${data.rol}` : "",
     photo: data.foto_url || "https://placehold.co/96x96?text=User",
     recentLoans: [],
     penalties: data.sancionado ? "Usuario sancionado" : "Sin sanciones",
@@ -33,7 +34,7 @@ const LoanRegistry = () => {
     author: data.autor ?? "Autor desconocido",
     year: data.anio ?? new Date(data.created_at || Date.now()).getFullYear(),
     genre: data.categoria || data.tipo || "Sin categoría",
-    copies: 1,
+    copies: data.existencias ?? 0,
     coverImage: "https://placehold.co/128x180?text=Libro",
     isbn: data.edicion,
   });
@@ -61,6 +62,7 @@ const LoanRegistry = () => {
 
       const data = await response.json();
       setUserData(mapUserResponseToCard(data));
+      setUserId(data?.id ?? null);
       toast.success("Usuario encontrado");
     } catch (error) {
       console.error("Error al buscar usuario por RUT", error);
@@ -101,7 +103,7 @@ const LoanRegistry = () => {
   };
 
   const handleSubmit = async () => {
-    if (!userData || !bookData) {
+    if (!userData || !bookData || userId === null) {
       toast.error("Busca primero el usuario y el material");
       return;
     }
@@ -126,6 +128,15 @@ const LoanRegistry = () => {
       }
 
       setShowSuccessDialog(true);
+      // Reflejar en UI los últimos préstamos (limitamos a 3 en el frontend)
+      setUserData((prev) =>
+        prev
+          ? {
+              ...prev,
+              recentLoans: [bookData.title, ...prev.recentLoans].slice(0, 3),
+            }
+          : prev
+      );
       toast.success("Préstamo registrado");
     } catch (error) {
       console.error("Error al registrar préstamo", error);

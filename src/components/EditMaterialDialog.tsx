@@ -21,6 +21,9 @@ interface EditMaterialDialogProps {
     anio?: number | null;
     edicion?: string | null;
     categoria?: string | null;
+    resumen?: string | null;
+    editorial?: string | null;
+    existencias?: number | null;
   } | null;
   onUpdated?: (updated: any) => void;
 }
@@ -32,6 +35,9 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
     year: "",
     isbn: "",
     quantity: "",
+    summary: "",
+    category: "",
+    editorial: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,6 +49,9 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
         year: document.anio ? String(document.anio) : "",
         isbn: document.edicion || "",
         quantity: document.existencias ? String(document.existencias) : "",
+        summary: document.resumen || "",
+        category: document.categoria || "",
+        editorial: document.editorial || "",
       });
     }
   }, [document]);
@@ -61,6 +70,9 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
             ? Number(formData.year)
             : undefined,
         edicion: formData.isbn || undefined,
+        categoria: formData.category || undefined,
+        resumen: formData.summary || undefined,
+        editorial: formData.editorial || undefined,
       };
       if (formData.quantity && !Number.isNaN(Number(formData.quantity))) {
         payload.existencias = Number(formData.quantity);
@@ -138,6 +150,42 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="edit-editorial" className="text-sm font-medium">
+              Editorial
+            </Label>
+            <Input
+              id="edit-editorial"
+              value={formData.editorial}
+              onChange={(e) => setFormData({ ...formData, editorial: e.target.value })}
+              className="bg-primary/10 border-0 rounded-xl"
+              placeholder="Ej: Planeta"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-category" className="text-sm font-medium">
+              Categoría
+            </Label>
+            <select
+              id="edit-category"
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full bg-primary/10 border-0 rounded-xl px-3 py-3 text-sm text-foreground"
+            >
+              <option value="">Sin categoría</option>
+              <option value="literatura_chilena">Literatura chilena</option>
+              <option value="tecnico_español">Técnico español</option>
+              <option value="novela">Novela</option>
+              <option value="ciencia_ficcion">Ciencia ficción</option>
+              <option value="historia">Historia</option>
+              <option value="infantil">Infantil</option>
+              <option value="accion">Acción</option>
+              <option value="guerra">Guerra</option>
+              <option value="romance">Romance</option>
+            </select>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="edit-year" className="text-sm font-medium">
               Año publicación
             </Label>
@@ -174,6 +222,19 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
               value={formData.quantity}
               onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
               className="bg-primary/10 border-0 rounded-xl"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-summary" className="text-sm font-medium">
+              Resumen
+            </Label>
+            <textarea
+              id="edit-summary"
+              value={formData.summary}
+              onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+              className="w-full bg-primary/10 border-0 rounded-xl min-h-[150px] resize-none text-sm text-foreground px-3 py-2"
+              placeholder="Añade un resumen breve"
             />
           </div>
 
