@@ -1,87 +1,19 @@
 import { useState } from "react";
 import Header from "@/components/Header";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Search, CheckCircle2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-interface LoanRecord {
-  isbn: string;
-  bookTitle: string;
-  bookAuthor: string;
-  bookYear: number;
-  bookGenre: string;
-  bookCover: string;
-  userName: string;
-  userRut: string;
-  userAddress: string;
-  userPhone: string;
-  userPhoto: string;
-  userRecentLoans: string[];
-  userPenalties: string;
-  loanDate: string;
-  dueDate: string;
-  isOverdue: boolean;
-}
+import { SearchInput, ResultDialog } from "@/components/library";
+import { mockActiveLoans } from "@/data/mockData";
+import type { LoanRecord } from "@/types/library";
 
 const ReturnEntry = () => {
   const [isbnInput, setIsbnInput] = useState("");
   const [loanData, setLoanData] = useState<LoanRecord | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
-  // Mock data - Simula préstamos activos
-  const mockActiveLoans: Record<string, LoanRecord> = {
-    "29140151561": {
-      isbn: "29140151561",
-      bookTitle: "Los Juegos del hambre",
-      bookAuthor: "Suzanne Collinsh",
-      bookYear: 2008,
-      bookGenre: "Aventura",
-      bookCover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
-      userName: "Viktor Tapia",
-      userRut: "152015144",
-      userAddress: "Las lilas 101",
-      userPhone: "982403417",
-      userPhoto: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400",
-      userRecentLoans: ["Papelucho", "Skibidi toilet vs tralateros", "Sigma vs chad"],
-      userPenalties: "NO PRESENTA",
-      loanDate: "03/09/25",
-      dueDate: "03/09/2026",
-      isOverdue: true,
-    },
-    "9788478884452": {
-      isbn: "9788478884452",
-      bookTitle: "1984",
-      bookAuthor: "George Orwell",
-      bookYear: 1949,
-      bookGenre: "Distopía",
-      bookCover: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400",
-      userName: "María González",
-      userRut: "187654321",
-      userAddress: "Av. Principal 456",
-      userPhone: "956789012",
-      userPhoto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
-      userRecentLoans: ["Harry Potter", "1984", "El Principito"],
-      userPenalties: "1 atraso pendiente",
-      loanDate: "10/11/2024",
-      dueDate: "25/11/2024",
-      isOverdue: false,
-    },
-  };
-
   const handleSearchIsbn = () => {
     const loan = mockActiveLoans[isbnInput];
-    if (loan) {
-      setLoanData(loan);
-    } else {
-      setLoanData(null);
-    }
+    setLoanData(loan || null);
   };
 
   const handleSubmit = () => {
@@ -107,32 +39,15 @@ const ReturnEntry = () => {
           <div className="grid md:grid-cols-2 gap-8">
             {/* Left Section - Input and Book Details */}
             <div className="space-y-6">
-              {/* ISBN Input - Always visible */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  Ingresa el ISBN / Nombre del material
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    value={isbnInput}
-                    onChange={(e) => setIsbnInput(e.target.value)}
-                    placeholder="Ej: 29140151561"
-                    className="flex-1 bg-amber-100 border-none"
-                  />
-                  <Button
-                    onClick={handleSearchIsbn}
-                    size="icon"
-                    className="bg-amber-100 hover:bg-amber-200 text-foreground"
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  ISBNs de prueba: 29140151561, 9788478884452
-                </p>
-              </div>
+              <SearchInput
+                label="Ingresa el ISBN / Nombre del material"
+                value={isbnInput}
+                onChange={setIsbnInput}
+                onSearch={handleSearchIsbn}
+                placeholder="Ej: 29140151561"
+                hint="ISBNs de prueba: 29140151561, 9788478884452"
+              />
 
-              {/* Book Details and Submit Button - Appears after ISBN search */}
               {loanData && (
                 <>
                   <div className="flex justify-center">
@@ -168,7 +83,6 @@ const ReturnEntry = () => {
                     </div>
                   </Card>
 
-                  {/* Penalty Warning - Only if overdue */}
                   {loanData.isOverdue && (
                     <Card className="p-4 bg-red-200 border-none">
                       <div className="text-center space-y-2">
@@ -191,7 +105,7 @@ const ReturnEntry = () => {
               )}
             </div>
 
-            {/* Right Section - User Information - Only visible after ISBN is found */}
+            {/* Right Section - User Information */}
             {loanData && (
               <Card className="p-6 bg-sky-200 border-none h-fit">
                 <div className="flex gap-4 mb-4">
@@ -234,28 +148,14 @@ const ReturnEntry = () => {
         </Card>
       </main>
 
-      {/* Success Dialog */}
-      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="sm:max-w-md bg-card border-2 border-primary">
-          <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold text-foreground">
-              Devolución Exitosa
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center justify-center py-6 space-y-4">
-            <CheckCircle2 className="w-20 h-20 text-green-500" />
-            <p className="text-center text-lg text-foreground">
-              El material ha sido devuelto correctamente
-            </p>
-            <Button
-              onClick={handleCloseDialog}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 mt-4"
-            >
-              Aceptar
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ResultDialog
+        open={showSuccessDialog}
+        onOpenChange={setShowSuccessDialog}
+        type="success"
+        title="Devolución Exitosa"
+        message="El material ha sido devuelto correctamente"
+        onClose={handleCloseDialog}
+      />
     </div>
   );
 };
