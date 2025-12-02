@@ -11,6 +11,7 @@ const PendingRequests = lazy(() => import("./pages/PendingRequests"));
 const MaterialManagement = lazy(() => import("./pages/MaterialManagement"));
 const LoanRegistry = lazy(() => import("./pages/LoanRegistry"));
 const ReturnEntry = lazy(() => import("./pages/ReturnEntry"));
+const Auth = lazy(() => import("./pages/Auth"));
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
         <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Cargando...</div>}>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/solicitudes-pendientes" element={<PendingRequests />} />
             <Route path="/gestion-material" element={<MaterialManagement />} />
             <Route path="/registro-prestamo" element={<LoanRegistry />} />

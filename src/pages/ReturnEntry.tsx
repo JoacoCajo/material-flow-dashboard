@@ -36,7 +36,6 @@ const ReturnEntry = () => {
       bookYear: doc.anio ?? new Date().getFullYear(),
       bookGenre: doc.categoria ?? "Sin categoría",
       bookCover: "https://placehold.co/128x180?text=Libro",
-      copies: 1,
       userName: `${usuario.nombres ?? ""} ${usuario.apellidos ?? ""}`.trim() || "Usuario",
       userRut: usuario.rut ?? "",
       userAddress: usuario.email ?? "Email no disponible",
