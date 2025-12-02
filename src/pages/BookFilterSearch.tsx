@@ -37,8 +37,8 @@ const BookFilterSearch = () => {
 
   // Filtros
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedAuthor, setSelectedAuthor] = useState<string>("");
-  const [selectedEditorial, setSelectedEditorial] = useState<string>("");
+  const [selectedAuthor, setSelectedAuthor] = useState<string>("all");
+  const [selectedEditorial, setSelectedEditorial] = useState<string>("all");
   const [yearFrom, setYearFrom] = useState<string>("");
   const [yearTo, setYearTo] = useState<string>("");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
@@ -62,8 +62,8 @@ const BookFilterSearch = () => {
 
   const clearFilters = () => {
     setSelectedCategories([]);
-    setSelectedAuthor("");
-    setSelectedEditorial("");
+    setSelectedAuthor("all");
+    setSelectedEditorial("all");
     setYearFrom("");
     setYearTo("");
     setOnlyAvailable(false);
@@ -101,12 +101,12 @@ const BookFilterSearch = () => {
       }
 
       // Filtro por autor
-      if (selectedAuthor && doc.autor !== selectedAuthor) {
+      if (selectedAuthor && selectedAuthor !== "all" && doc.autor !== selectedAuthor) {
         return false;
       }
 
       // Filtro por editorial
-      if (selectedEditorial && doc.editorial !== selectedEditorial) {
+      if (selectedEditorial && selectedEditorial !== "all" && doc.editorial !== selectedEditorial) {
         return false;
       }
 
@@ -208,7 +208,7 @@ const BookFilterSearch = () => {
                     <SelectValue placeholder="Todos los autores" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todos los autores</SelectItem>
+                    <SelectItem value="all">Todos los autores</SelectItem>
                     {filterOptions.authors.map((author) => (
                       <SelectItem key={author} value={author}>
                         {author}
@@ -226,7 +226,7 @@ const BookFilterSearch = () => {
                     <SelectValue placeholder="Todas las editoriales" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Todas las editoriales</SelectItem>
+                    <SelectItem value="all">Todas las editoriales</SelectItem>
                     {filterOptions.editorials.map((editorial) => (
                       <SelectItem key={editorial} value={editorial}>
                         {editorial}
