@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { BookOpen, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { login as loginApi, registerUser } from "@/lib/auth";
+import libraryBackground from "@/assets/library-background.jpg";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -74,9 +74,10 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-
+    <div 
+      className="min-h-screen bg-cover bg-center bg-no-repeat flex items-center justify-center"
+      style={{ backgroundImage: `url(${libraryBackground})` }}
+    >
       <main className="container mx-auto px-6 py-12 flex items-center justify-center">
         <Card className="w-full max-w-md p-8 bg-card">
           {/* Icon */}
