@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import MenuButton from "@/components/MenuButton";
 import PendingRequestCard from "@/components/PendingRequestCard";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { mockPendingRequests } from "@/data/mockData";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -24,13 +24,8 @@ const Dashboard = () => {
     navigate("/solicitudes-pendientes");
   };
 
-  const pendingRequests = [
-    { id: 1, title: "Los juegos del hambre", duration: "hace 10 minutos" },
-    { id: 2, title: "Papeluco 2", duration: "hace 12 minutos" },
-    { id: 3, title: "Papeluco 3", duration: "hace 20 minutos" },
-    { id: 4, title: "Papeluco 4", duration: "hace 150 minutos" },
-    { id: 5, title: "Signo vs Chad", duration: "hace 150 minutos" },
-  ];
+  // Solo mostrar las primeras 5 solicitudes en el dashboard
+  const displayedRequests = mockPendingRequests.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background">
@@ -85,7 +80,7 @@ const Dashboard = () => {
                 </h3>
                 
                 <div className="space-y-3">
-                  {pendingRequests.map((request) => (
+                  {displayedRequests.map((request) => (
                     <PendingRequestCard
                       key={request.id}
                       title={request.title}

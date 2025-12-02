@@ -1,0 +1,142 @@
+// Datos mock centralizados - Reemplazar con conexión a base de datos real
+import type { User, Book, LoanRecord, PendingRequest } from "@/types/library";
+
+export const mockUsers: Record<string, User> = {
+  "152015144": {
+    name: "Viktor Tapia",
+    rut: "152015144",
+    address: "Las lilas 101",
+    phone: "982403417",
+    photo: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400",
+    recentLoans: ["Papelucho", "Skibidi toilet vs tralateros", "Sigma vs chad"],
+    penalties: "NO PRESENTA",
+  },
+  "187654321": {
+    name: "María González",
+    rut: "187654321",
+    address: "Av. Principal 456",
+    phone: "956789012",
+    photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+    recentLoans: ["Harry Potter", "1984", "El Principito"],
+    penalties: "1 atraso pendiente",
+  },
+};
+
+export const mockBooks: Record<string, Book> = {
+  "29140151561": {
+    title: "Los juegos del hambre",
+    author: "Suzanne Collins",
+    year: 2008,
+    genre: "Aventura",
+    copies: 3,
+    coverImage: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
+  },
+  "9788478884452": {
+    title: "1984",
+    author: "George Orwell",
+    year: 1949,
+    genre: "Distopía",
+    copies: 5,
+    coverImage: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400",
+  },
+  "9780439708180": {
+    title: "Harry Potter y la Piedra Filosofal",
+    author: "J.K. Rowling",
+    year: 1997,
+    genre: "Fantasía",
+    copies: 7,
+    coverImage: "https://images.unsplash.com/photo-1621351183012-e2f9972dd9bf?w=400",
+  },
+};
+
+export const mockActiveLoans: Record<string, LoanRecord> = {
+  "29140151561": {
+    isbn: "29140151561",
+    bookTitle: "Los Juegos del hambre",
+    bookAuthor: "Suzanne Collinsh",
+    bookYear: 2008,
+    bookGenre: "Aventura",
+    bookCover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400",
+    userName: "Viktor Tapia",
+    userRut: "152015144",
+    userAddress: "Las lilas 101",
+    userPhone: "982403417",
+    userPhoto: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400",
+    userRecentLoans: ["Papelucho", "Skibidi toilet vs tralateros", "Sigma vs chad"],
+    userPenalties: "NO PRESENTA",
+    loanDate: "03/09/25",
+    dueDate: "03/09/2026",
+    isOverdue: true,
+  },
+  "9788478884452": {
+    isbn: "9788478884452",
+    bookTitle: "1984",
+    bookAuthor: "George Orwell",
+    bookYear: 1949,
+    bookGenre: "Distopía",
+    bookCover: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400",
+    userName: "María González",
+    userRut: "187654321",
+    userAddress: "Av. Principal 456",
+    userPhone: "956789012",
+    userPhoto: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400",
+    userRecentLoans: ["Harry Potter", "1984", "El Principito"],
+    userPenalties: "1 atraso pendiente",
+    loanDate: "10/11/2024",
+    dueDate: "25/11/2024",
+    isOverdue: false,
+  },
+};
+
+export const mockPendingRequests: PendingRequest[] = [
+  { id: 1, title: "Los juegos del hambre", duration: "hace 10 minutos" },
+  { id: 2, title: "Papeluco 2", duration: "hace 12 minutos" },
+  { id: 3, title: "Papeluco 3", duration: "hace 20 minutos" },
+  { id: 4, title: "Papeluco 4", duration: "hace 150 minutos" },
+  { id: 5, title: "Signo vs Chad", duration: "hace 150 minutos" },
+  { id: 6, title: "El principito", duration: "hace 180 minutos" },
+  { id: 7, title: "1984", duration: "hace 200 minutos" },
+  { id: 8, title: "Cien años de soledad", duration: "hace 220 minutos" },
+];
+
+export const mockCatalogBooks: Book[] = [
+  {
+    id: 1,
+    title: "Los Juegos del Hambre",
+    author: "Suzanne Collins",
+    year: 2008,
+    availability: "3 de 7 disponibles",
+    summary: "En una oscura versión del futuro próximo, doce chicos y doce chicas se ven obligados a participar en un reality show llamado Los Juegos del Hambre. Sólo hay una regla: matar o morir.",
+    publisher: "Molino",
+    coverImage: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400&h=600&fit=crop",
+    category: "Aventura",
+    genre: "Aventura",
+    copies: 3,
+  },
+  {
+    id: 2,
+    title: "Los Juegos del hambre: En Llamas",
+    author: "Suzanne Collins",
+    year: 2021,
+    availability: "Última unidad disponible",
+    summary: "Katniss Everdeen ha sobrevivido a Los juegos del hambre. Pero el Capitolio quiere venganza.",
+    publisher: "Molino",
+    coverImage: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
+    category: "Aventura",
+    genre: "Aventura",
+    copies: 1,
+  },
+  {
+    id: 3,
+    title: "Amanecer en la Cosecha",
+    author: "Suzanne Collins",
+    year: 2025,
+    availability: "Disponible el 14/03",
+    summary: "Amanecer en la cosecha vuelve al mundo de Panem sesenta y cuatro años antes de los eventos de Los Juegos del Hambre.",
+    publisher: "Molino",
+    coverImage: "https://images.unsplash.com/photo-1551029506-0807df4e2031?w=400&h=600&fit=crop",
+    category: "Aventura",
+    genre: "Aventura",
+    copies: 0,
+  },
+];
