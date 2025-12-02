@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
 import { toast } from "sonner";
 import { mockCatalogBooks } from "@/data/mockData";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 const MaterialManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +17,8 @@ const MaterialManagement = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedBookId, setSelectedBookId] = useState<number | null>(null);
+  const { data: user } = useAuthUser();
+  const isAdmin = user?.rol === "admin";
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -107,22 +110,24 @@ const MaterialManagement = () => {
               </Button>
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex gap-4 justify-end">
-              <Button
-                onClick={handleAddTitles}
-                className="px-6 py-3 rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-              >
-                Añadir títulos
-              </Button>
-              <Button
-                onClick={handleEditTitles}
-                disabled={selectedBookId === null}
-                className="px-6 py-3 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Editar títulos
-              </Button>
-            </div>
+            {/* Botones de acción (solo admins) */}
+            {isAdmin && (
+              <div className="flex gap-4 justify-end">
+                <Button
+                  onClick={handleAddTitles}
+                  className="px-6 py-3 rounded-xl bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                >
+                  Añadir títulos
+                </Button>
+                <Button
+                  onClick={handleEditTitles}
+                  disabled={selectedBookId === null}
+                  className="px-6 py-3 rounded-xl bg-accent hover:bg-accent/90 text-accent-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Editar títulos
+                </Button>
+              </div>
+            )}
 
             {/* Lista de libros */}
             <div className="space-y-6">

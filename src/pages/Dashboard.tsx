@@ -1,12 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import MenuButton from "@/components/MenuButton";
-import PendingRequestCard from "@/components/PendingRequestCard";
 import { Button } from "@/components/ui/button";
-import { mockPendingRequests } from "@/data/mockData";
+import { BookOpen, Users, FileText, FileWarning } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    total_libros: 0,
+    usuarios_registrados: 0,
+    prestamos_activos: 0,
+    prestamos_atrasados: 0,
+  });
+  const [loadingStats, setLoadingStats] = useState(false);
 
   const handleAddEditMaterial = () => {
     navigate("/gestion-material");
@@ -20,12 +30,58 @@ const Dashboard = () => {
     navigate("/ingreso-devolucion");
   };
 
-  const handleViewPendingRequests = () => {
-    navigate("/solicitudes-pendientes");
-  };
+  const cards = [
+    {
+      label: "Total de Libros",
+      value: stats.total_libros,
+      icon: <BookOpen className="w-6 h-6 text-sky-600" />,
+      bg: "bg-sky-50",
+    },
+    {
+      label: "Usuarios Registrados",
+      value: stats.usuarios_registrados,
+      icon: <Users className="w-6 h-6 text-emerald-600" />,
+      bg: "bg-emerald-50",
+    },
+    {
+      label: "Préstamos Activos",
+      value: stats.prestamos_activos,
+      icon: <FileText className="w-6 h-6 text-blue-700" />,
+      bg: "bg-blue-50",
+    },
+    {
+      label: "Préstamos Atrasados",
+      value: stats.prestamos_atrasados,
+      icon: <FileWarning className="w-6 h-6 text-red-600" />,
+      bg: "bg-red-50",
+    },
+  ];
 
-  // Solo mostrar las primeras 5 solicitudes en el dashboard
-  const displayedRequests = mockPendingRequests.slice(0, 5);
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoadingStats(true);
+      try {
+        const res = await fetch(`${API_BASE_URL}/dashboard/stats`);
+        if (!res.ok) {
+          throw new Error("No se pudieron obtener las estadísticas");
+        }
+        const data = await res.json();
+        setStats({
+          total_libros: data.total_libros ?? 0,
+          usuarios_registrados: data.usuarios_registrados ?? 0,
+          prestamos_activos: data.prestamos_activos ?? 0,
+          prestamos_atrasados: data.prestamos_atrasados ?? 0,
+        });
+      } catch (error) {
+        console.error("Error al cargar estadísticas", error);
+        toast.error("No se pudieron cargar las estadísticas del dashboard");
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,24 +126,25 @@ const Dashboard = () => {
               >
                 Resumen
               </Button>
-              
-              <div 
-                className="bg-summary-bg rounded-3xl p-6 space-y-4 cursor-pointer hover:shadow-lg transition-shadow"
-                onClick={handleViewPendingRequests}
-              >
-                <h3 className="text-lg font-semibold text-foreground text-center mb-4">
-                  Solicitudes pendientes
-                </h3>
-                
-                <div className="space-y-3">
-                  {displayedRequests.map((request) => (
-                    <PendingRequestCard
-                      key={request.id}
-                      title={request.title}
-                      duration={request.duration}
-                    />
-                  ))}
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {cards.map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-center gap-4 p-5">
+                      <div className={`${item.bg} rounded-xl p-3 flex items-center justify-center`}>
+                        {item.icon}
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-2xl font-bold text-foreground">
+                          {loadingStats ? "..." : item.value}
+                        </p>
+                        <p className="text-sm text-muted-foreground">{item.label}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

@@ -14,9 +14,9 @@ const LoanRegistry = () => {
   const [userData, setUserData] = useState<User | null>(null);
   const [bookData, setBookData] = useState<Book | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [loadingRut, setLoadingRut] = useState(false);
   const [loadingIsbn, setLoadingIsbn] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const mapUserResponseToCard = (data: any): User => ({
     name: `${data.nombres ?? ""} ${data.apellidos ?? ""}`.trim() || data.email || "Usuario",
@@ -100,11 +100,39 @@ const LoanRegistry = () => {
     }
   };
 
-  const handleSubmit = () => {
-    if (bookData && bookData.copies >= 1) {
+  const handleSubmit = async () => {
+    if (!userData || !bookData) {
+      toast.error("Busca primero el usuario y el material");
+      return;
+    }
+
+    setLoadingSubmit(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/prestamos/registrar-desde-rut-isbn`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          rut: rutInput.trim(),
+          isbn: isbnInput.trim(),
+          tipo_prestamo: "domicilio",
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => null);
+        throw new Error(errorBody?.detail || "No se pudo registrar el préstamo");
+      }
+
       setShowSuccessDialog(true);
-    } else {
-      setShowErrorDialog(true);
+      toast.success("Préstamo registrado");
+    } catch (error) {
+      console.error("Error al registrar préstamo", error);
+      const msg = error instanceof Error ? error.message : "Error al registrar el préstamo";
+      toast.error(msg);
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
@@ -114,10 +142,6 @@ const LoanRegistry = () => {
     setIsbnInput("");
     setUserData(null);
     setBookData(null);
-  };
-
-  const handleCloseErrorDialog = () => {
-    setShowErrorDialog(false);
   };
 
   return (
@@ -158,10 +182,10 @@ const LoanRegistry = () => {
                   <div className="flex justify-center pt-4">
                     <Button
                       onClick={handleSubmit}
-                      disabled={!bookData}
+                      disabled={!bookData || loadingSubmit}
                       className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 disabled:opacity-50"
                     >
-                      Enviar
+                      {loadingSubmit ? "Registrando..." : "Enviar"}
                     </Button>
                   </div>
 
@@ -185,14 +209,6 @@ const LoanRegistry = () => {
         onClose={handleCloseSuccessDialog}
       />
 
-      <ResultDialog
-        open={showErrorDialog}
-        onOpenChange={setShowErrorDialog}
-        type="error"
-        title="Error en el Préstamo"
-        message="No hay existencias disponibles de este material"
-        onClose={handleCloseErrorDialog}
-      />
     </div>
   );
 };
