@@ -3,17 +3,81 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SearchInput, ResultDialog } from "@/components/library";
-import { mockActiveLoans } from "@/data/mockData";
 import type { LoanRecord } from "@/types/library";
+import { toast } from "sonner";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
 
 const ReturnEntry = () => {
   const [isbnInput, setIsbnInput] = useState("");
   const [loanData, setLoanData] = useState<LoanRecord | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [loadingSearch, setLoadingSearch] = useState(false);
 
-  const handleSearchIsbn = () => {
-    const loan = mockActiveLoans[isbnInput];
-    setLoanData(loan || null);
+  const mapResponseToLoan = (resp: any): LoanRecord => {
+    const prestamo = resp.prestamo ?? {};
+    const usuario = resp.usuario ?? {};
+    const doc = resp.documento ?? {};
+
+    const fechaPrestamo = prestamo.fecha_prestamo ? new Date(prestamo.fecha_prestamo) : new Date();
+    const fechaDevolucion = prestamo.fecha_devolucion_estimada
+      ? new Date(prestamo.fecha_devolucion_estimada)
+      : null;
+
+    const isOverdue =
+      resp.vencido ||
+      (fechaDevolucion ? fechaDevolucion.getTime() < Date.now() : false) ||
+      prestamo.estado === "vencido";
+
+    return {
+      isbn: doc.edicion ?? "",
+      bookTitle: doc.titulo ?? "Título no disponible",
+      bookAuthor: doc.autor ?? "Autor desconocido",
+      bookYear: doc.anio ?? new Date().getFullYear(),
+      bookGenre: doc.categoria ?? "Sin categoría",
+      bookCover: "https://placehold.co/128x180?text=Libro",
+      copies: 1,
+      userName: `${usuario.nombres ?? ""} ${usuario.apellidos ?? ""}`.trim() || "Usuario",
+      userRut: usuario.rut ?? "",
+      userAddress: usuario.email ?? "Email no disponible",
+      userPhone: usuario.rol ? `Rol: ${usuario.rol}` : "Teléfono no disponible",
+      userPhoto: "https://placehold.co/96x96?text=User",
+      userRecentLoans: [],
+      userPenalties: usuario.sancionado ? "Usuario sancionado" : "Sin sanciones",
+      loanDate: fechaPrestamo.toLocaleDateString(),
+      dueDate: fechaDevolucion ? fechaDevolucion.toLocaleDateString() : "No definida",
+      isOverdue,
+    };
+  };
+
+  const handleSearchIsbn = async () => {
+    if (!isbnInput.trim()) {
+      toast.error("Ingresa un ISBN para continuar");
+      return;
+    }
+
+    setLoadingSearch(true);
+    setLoanData(null);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/prestamos/buscar-por-isbn/${encodeURIComponent(isbnInput.trim())}`
+      );
+
+      if (!response.ok) {
+        toast.error("No se encontró un préstamo para ese ISBN");
+        return;
+      }
+
+      const data = await response.json();
+      setLoanData(mapResponseToLoan(data));
+      toast.success("Préstamo encontrado");
+    } catch (error) {
+      console.error("Error al buscar préstamo por ISBN", error);
+      toast.error("No se pudo buscar el préstamo. Intenta nuevamente.");
+    } finally {
+      setLoadingSearch(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -45,7 +109,8 @@ const ReturnEntry = () => {
                 onChange={setIsbnInput}
                 onSearch={handleSearchIsbn}
                 placeholder="Ej: 29140151561"
-                hint="ISBNs de prueba: 29140151561, 9788478884452"
+                hint="Busca por ISBN exacto"
+                disabled={loadingSearch}
               />
 
               {loanData && (

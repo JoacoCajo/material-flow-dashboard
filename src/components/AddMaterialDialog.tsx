@@ -65,6 +65,11 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
         return;
       }
 
+      const quantityNumber =
+        formData.quantity && !Number.isNaN(Number(formData.quantity))
+          ? Number(formData.quantity)
+          : undefined;
+
       const payload = {
         tipo: "libro",
         titulo: normalizedTitle,
@@ -77,6 +82,8 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
         edicion: formData.isbn || undefined,
         categoria: undefined,
         tipo_medio: "fisico",
+        existencias: quantityNumber,
+        disponible: quantityNumber ? quantityNumber > 0 : true,
       };
 
       const response = await fetch(`${API_BASE_URL}/documentos/`, {

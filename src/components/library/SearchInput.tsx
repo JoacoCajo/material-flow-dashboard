@@ -9,6 +9,7 @@ interface SearchInputProps {
   onSearch: () => void;
   placeholder?: string;
   hint?: string;
+  disabled?: boolean;
 }
 
 const SearchInput = ({
@@ -18,6 +19,7 @@ const SearchInput = ({
   onSearch,
   placeholder = "",
   hint,
+  disabled = false,
 }: SearchInputProps) => {
   return (
     <div className="space-y-2">
@@ -31,11 +33,13 @@ const SearchInput = ({
           placeholder={placeholder}
           className="flex-1 bg-amber-100 border-none"
           onKeyDown={(e) => e.key === "Enter" && onSearch()}
+          disabled={disabled}
         />
         <Button
           onClick={onSearch}
           size="icon"
-          className="bg-amber-100 hover:bg-amber-200 text-foreground"
+          className="bg-amber-100 hover:bg-amber-200 text-foreground disabled:opacity-50"
+          disabled={disabled}
         >
           <Search className="h-4 w-4" />
         </Button>

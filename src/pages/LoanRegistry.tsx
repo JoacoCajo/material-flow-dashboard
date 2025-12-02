@@ -3,8 +3,10 @@ import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SearchInput, UserInfoCard, BookInfoCard, ResultDialog } from "@/components/library";
-import { mockUsers, mockBooks } from "@/data/mockData";
 import type { User, Book } from "@/types/library";
+import { toast } from "sonner";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
 
 const LoanRegistry = () => {
   const [rutInput, setRutInput] = useState("");
@@ -13,15 +15,89 @@ const LoanRegistry = () => {
   const [bookData, setBookData] = useState<Book | null>(null);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [loadingRut, setLoadingRut] = useState(false);
+  const [loadingIsbn, setLoadingIsbn] = useState(false);
 
-  const handleSearchRut = () => {
-    const user = mockUsers[rutInput];
-    setUserData(user || null);
+  const mapUserResponseToCard = (data: any): User => ({
+    name: `${data.nombres ?? ""} ${data.apellidos ?? ""}`.trim() || data.email || "Usuario",
+    rut: data.rut ?? rutInput,
+    address: data.email ?? "Sin email registrado",
+    phone: data.rol ? `Rol: ${data.rol}` : "Teléfono no disponible",
+    photo: data.foto_url || "https://placehold.co/96x96?text=User",
+    recentLoans: [],
+    penalties: data.sancionado ? "Usuario sancionado" : "Sin sanciones",
+  });
+
+  const mapDocumentoToBookCard = (data: any): Book => ({
+    title: data.titulo ?? "Título no disponible",
+    author: data.autor ?? "Autor desconocido",
+    year: data.anio ?? new Date(data.created_at || Date.now()).getFullYear(),
+    genre: data.categoria || data.tipo || "Sin categoría",
+    copies: 1,
+    coverImage: "https://placehold.co/128x180?text=Libro",
+    isbn: data.edicion,
+  });
+
+  const handleSearchRut = async () => {
+    if (!rutInput.trim()) {
+      toast.error("Ingresa un RUT para continuar");
+      return;
+    }
+
+    setLoadingRut(true);
+    setBookData(null);
+    setIsbnInput("");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/usuarios/buscar-por-rut/${encodeURIComponent(rutInput.trim())}`
+      );
+
+      if (!response.ok) {
+        setUserData(null);
+        toast.error("No se encontró un usuario con ese RUT");
+        return;
+      }
+
+      const data = await response.json();
+      setUserData(mapUserResponseToCard(data));
+      toast.success("Usuario encontrado");
+    } catch (error) {
+      console.error("Error al buscar usuario por RUT", error);
+      toast.error("No se pudo buscar el usuario. Intenta nuevamente.");
+    } finally {
+      setLoadingRut(false);
+    }
   };
 
-  const handleSearchIsbn = () => {
-    const book = mockBooks[isbnInput];
-    setBookData(book || null);
+  const handleSearchIsbn = async () => {
+    if (!isbnInput.trim()) {
+      toast.error("Ingresa un ISBN para continuar");
+      return;
+    }
+
+    setLoadingIsbn(true);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/documentos/buscar-por-isbn/${encodeURIComponent(isbnInput.trim())}`
+      );
+
+      if (!response.ok) {
+        setBookData(null);
+        toast.error("No se encontró un material con ese ISBN");
+        return;
+      }
+
+      const data = await response.json();
+      setBookData(mapDocumentoToBookCard(data));
+      toast.success("Material encontrado");
+    } catch (error) {
+      console.error("Error al buscar material por ISBN", error);
+      toast.error("No se pudo buscar el material. Intenta nuevamente.");
+    } finally {
+      setLoadingIsbn(false);
+    }
   };
 
   const handleSubmit = () => {
@@ -63,7 +139,8 @@ const LoanRegistry = () => {
                 onChange={setRutInput}
                 onSearch={handleSearchRut}
                 placeholder="Ej: 152015144 o 187654321"
-                hint="RUTs de prueba: 152015144, 187654321"
+                disabled={loadingRut}
+                hint="Ingresa el RUT completo sin guión"
               />
 
               {userData && (
@@ -74,7 +151,8 @@ const LoanRegistry = () => {
                     onChange={setIsbnInput}
                     onSearch={handleSearchIsbn}
                     placeholder="Ej: 29140151561"
-                    hint="ISBNs de prueba: 29140151561, 9788478884452, 9780439708180"
+                    disabled={loadingIsbn}
+                    hint="Busca por ISBN exacto"
                   />
 
                   <div className="flex justify-center pt-4">
