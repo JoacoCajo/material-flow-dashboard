@@ -47,6 +47,20 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        status: {
+          active: "hsl(var(--status-active))",
+          "active-foreground": "hsl(var(--status-active-foreground))",
+          sanctioned: "hsl(var(--status-sanctioned))",
+          "sanctioned-foreground": "hsl(var(--status-sanctioned-foreground))",
+          inactive: "hsl(var(--status-inactive))",
+          "inactive-foreground": "hsl(var(--status-inactive-foreground))",
+          pending: "hsl(var(--status-pending))",
+          "pending-foreground": "hsl(var(--status-pending-foreground))",
+        },
+        progress: {
+          bg: "hsl(var(--progress-bg))",
+          fill: "hsl(var(--progress-fill))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -56,19 +70,6 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
-        },
-        header: {
-          bg: "hsl(var(--header-bg))",
-        },
-        menu: {
-          button: "hsl(var(--menu-button))",
-          foreground: "hsl(var(--menu-button-foreground))",
-        },
-        summary: {
-          bg: "hsl(var(--summary-bg))",
-        },
-        request: {
-          item: "hsl(var(--request-item))",
         },
       },
       borderRadius: {

@@ -8,87 +8,98 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 204 100% 97%;
-    --foreground: 220 20% 20%;
+    --background: 210 20% 98%;
+    --foreground: 215 25% 27%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 20%;
+    --card-foreground: 215 25% 27%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 20%;
+    --popover-foreground: 215 25% 27%;
 
-    --primary: 203 89% 75%;
-    --primary-foreground: 220 20% 20%;
+    --primary: 207 90% 61%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 145 50% 80%;
-    --secondary-foreground: 220 20% 20%;
+    --secondary: 210 17% 95%;
+    --secondary-foreground: 215 25% 27%;
 
-    --muted: 203 50% 95%;
-    --muted-foreground: 220 15% 50%;
+    --muted: 210 17% 95%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 145 50% 80%;
-    --accent-foreground: 220 20% 20%;
+    --accent: 207 90% 61%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 203 40% 90%;
-    --input: 203 40% 90%;
-    --ring: 203 89% 75%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 207 90% 61%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    --header-bg: 0 0% 100%;
-    --menu-button: 145 50% 80%;
-    --menu-button-foreground: 220 20% 20%;
-    --summary-bg: 203 50% 90%;
-    --request-item: 0 0% 100%;
+    /* Status colors */
+    --status-active: 142 76% 36%;
+    --status-active-foreground: 0 0% 100%;
+    
+    --status-sanctioned: 351 83% 82%;
+    --status-sanctioned-foreground: 351 95% 25%;
+    
+    --status-inactive: 207 90% 61%;
+    --status-inactive-foreground: 0 0% 100%;
+    
+    --status-pending: 48 96% 53%;
+    --status-pending-foreground: 26 83% 14%;
+
+    /* Registration progress */
+    --progress-bg: 214 32% 91%;
+    --progress-fill: 142 76% 36%;
 
     --sidebar-background: 0 0% 98%;
+
     --sidebar-foreground: 240 5.3% 26.1%;
+
     --sidebar-primary: 240 5.9% 10%;
+
     --sidebar-primary-foreground: 0 0% 98%;
+
     --sidebar-accent: 240 4.8% 95.9%;
+
     --sidebar-accent-foreground: 240 5.9% 10%;
+
     --sidebar-border: 220 13% 91%;
+
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 220 30% 10%;
-    --foreground: 0 0% 95%;
+    --background: 215 28% 17%;
+    --foreground: 210 20% 98%;
 
-    --card: 220 25% 15%;
-    --card-foreground: 0 0% 95%;
+    --card: 215 28% 17%;
+    --card-foreground: 210 20% 98%;
 
-    --popover: 220 25% 15%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 215 28% 17%;
+    --popover-foreground: 210 20% 98%;
 
-    --primary: 203 70% 60%;
+    --primary: 207 90% 61%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 145 40% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 215 25% 27%;
+    --secondary-foreground: 210 20% 98%;
 
-    --muted: 220 25% 20%;
-    --muted-foreground: 220 15% 65%;
+    --muted: 215 25% 27%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 145 40% 50%;
+    --accent: 207 90% 61%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 220 25% 25%;
-    --input: 220 25% 25%;
-    --ring: 203 70% 60%;
-
-    --header-bg: 220 25% 15%;
-    --menu-button: 145 40% 50%;
-    --menu-button-foreground: 0 0% 100%;
-    --summary-bg: 220 25% 20%;
-    --request-item: 220 25% 25%;
-
+    --border: 215 25% 27%;
+    --input: 215 25% 27%;
+    --ring: 207 90% 61%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

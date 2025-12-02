@@ -3,15 +3,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-
-const PendingRequests = lazy(() => import("./pages/PendingRequests"));
-const MaterialManagement = lazy(() => import("./pages/MaterialManagement"));
-const LoanRegistry = lazy(() => import("./pages/LoanRegistry"));
-const ReturnEntry = lazy(() => import("./pages/ReturnEntry"));
-const Auth = lazy(() => import("./pages/Auth"));
+import UsersPage from "./pages/UsersPage";
+import OverdueLoansPage from "./pages/OverdueLoansPage";
+import LoanHistoryPage from "./pages/LoanHistoryPage";
+import RegisterStep1 from "./pages/RegisterStep1";
+import RegisterStep2 from "./pages/RegisterStep2";
+import RegisterStep3 from "./pages/RegisterStep3";
+import RegisterStep4 from "./pages/RegisterStep4";
 
 const queryClient = new QueryClient();
 
@@ -21,19 +21,18 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Cargando...</div>}>
-          <Routes>
-            <Route path="/" element={<MaterialManagement />} />
-            <Route path="/admin" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/solicitudes-pendientes" element={<PendingRequests />} />
-            <Route path="/gestion-material" element={<MaterialManagement />} />
-            <Route path="/registro-prestamo" element={<LoanRegistry />} />
-            <Route path="/ingreso-devolucion" element={<ReturnEntry />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/overdue-loans" element={<OverdueLoansPage />} />
+          <Route path="/loan-history/:id" element={<LoanHistoryPage />} />
+          <Route path="/register/step1" element={<RegisterStep1 />} />
+          <Route path="/register/step2" element={<RegisterStep2 />} />
+          <Route path="/register/step3" element={<RegisterStep3 />} />
+          <Route path="/register/step4" element={<RegisterStep4 />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
