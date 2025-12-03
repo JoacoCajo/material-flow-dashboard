@@ -84,67 +84,62 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <Header />
       
       <main className="container mx-auto px-6 py-12">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-foreground mb-8">¡Hola Admin!</h2>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Menu Section */}
-            <div className="space-y-6">
-              <Button
-                variant="ghost"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 px-8 rounded-2xl w-full shadow-sm"
-                disabled
-              >
-                Menú
-              </Button>
-              
-              <div className="space-y-4 flex flex-col items-center">
-                <MenuButton onClick={handleAddEditMaterial}>
-                  Añadir / editar material
-                </MenuButton>
-                
-                <MenuButton onClick={handleLoanRegistry}>
-                  Registro de préstamo
-                </MenuButton>
-                
-                <MenuButton onClick={handleReturnEntry}>
-                  Ingreso devolución
-                </MenuButton>
+        <div className="max-w-6xl mx-auto space-y-6">
+          <div className="bg-white border border-border rounded-3xl p-8 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <p className="text-sm text-muted-foreground uppercase tracking-wide">Panel de administrador</p>
+                <h2 className="text-3xl font-bold text-foreground mt-1">¡Hola Admin!</h2>
+                <p className="text-sm text-muted-foreground mt-1">Accesos rápidos y estado del sistema.</p>
               </div>
             </div>
 
-            {/* Summary Section */}
-            <div className="space-y-6">
-              <Button
-                variant="ghost"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 px-8 rounded-2xl w-full shadow-sm"
-                disabled
-              >
-                Resumen
-              </Button>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {cards.map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-center gap-4 p-5">
-                      <div className={`${item.bg} rounded-xl p-3 flex items-center justify-center`}>
-                        {item.icon}
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-2xl font-bold text-foreground">
-                          {loadingStats ? "..." : item.value}
-                        </p>
-                        <p className="text-sm text-muted-foreground">{item.label}</p>
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Menu Section */}
+              <div className="space-y-4">
+                <p className="text-sm font-semibold text-muted-foreground">Acciones principales</p>
+                <div className="bg-slate-50 border border-border rounded-2xl p-4 flex flex-col gap-3">
+                  <MenuButton onClick={handleAddEditMaterial}>
+                    Añadir / editar material
+                  </MenuButton>
+                  
+                  <MenuButton onClick={handleLoanRegistry}>
+                    Registro de préstamo
+                  </MenuButton>
+                  
+                  <MenuButton onClick={handleReturnEntry}>
+                    Ingreso devolución
+                  </MenuButton>
+                </div>
+              </div>
+
+              {/* Summary Section */}
+              <div className="space-y-4">
+                <p className="text-sm font-semibold text-muted-foreground">Resumen del sistema</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {cards.map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-2xl border border-border bg-white shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-center gap-4 p-5">
+                        <div className={`${item.bg} rounded-xl p-3 flex items-center justify-center`}>
+                          {item.icon}
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-2xl font-bold text-foreground">
+                            {loadingStats ? "..." : item.value}
+                          </p>
+                          <p className="text-sm text-muted-foreground">{item.label}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>

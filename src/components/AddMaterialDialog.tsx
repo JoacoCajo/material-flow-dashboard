@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { X, Upload } from "lucide-react";
+import { X } from "lucide-react";
 import { toast } from "sonner";
 
 interface AddMaterialDialogProps {
@@ -29,7 +29,7 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
     quantity: "",
     summary: "",
     editorial: "",
-    cover: null as File | null,
+    coverUrl: "",
     category: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,12 +78,13 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
         autor: formData.author.trim(),
         editorial: formData.editorial || undefined,
         resumen: formData.summary || undefined,
+        link: formData.coverUrl || undefined,
         anio:
           formData.year && !Number.isNaN(Number(formData.year))
             ? Number(formData.year)
             : undefined,
         edicion: formData.isbn || undefined,
-        categoria: formData.category || undefined,
+        categoria: formData.category ? formData.category.toLowerCase().trim() : undefined,
         tipo_medio: "fisico",
         existencias: quantityNumber,
       };
@@ -110,7 +111,7 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
         isbn: "",
         quantity: "",
         summary: "",
-        cover: null,
+        coverUrl: "",
         editorial: "",
         category: "",
       });
@@ -120,12 +121,6 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
       toast.error(message);
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, cover: e.target.files[0] });
     }
   };
 
@@ -193,19 +188,19 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
             <select
               id="category"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value.toLowerCase() })}
               className="w-full bg-primary/10 border-0 rounded-xl px-3 py-3 text-sm text-foreground"
             >
               <option value="">Sin categoría</option>
-              <option value="literatura_chilena">Literatura chilena</option>
-              <option value="tecnico_español">Técnico español</option>
-              <option value="novela">Novela</option>
-              <option value="ciencia_ficcion">Ciencia ficción</option>
-              <option value="historia">Historia</option>
-              <option value="infantil">Infantil</option>
-              <option value="accion">Acción</option>
-              <option value="guerra">Guerra</option>
-              <option value="romance">Romance</option>
+              <option value="Literatura chilena">Literatura chilena</option>
+              <option value="Técnico español">Técnico español</option>
+              <option value="Novela">Novela</option>
+              <option value="Ciencia ficción">Ciencia ficción</option>
+              <option value="Historia">Historia</option>
+              <option value="Infantil">Infantil</option>
+              <option value="Acción">Acción</option>
+              <option value="Guerra">Guerra</option>
+              <option value="Romance">Romance</option>
             </select>
           </div>
 
@@ -264,27 +259,16 @@ const AddMaterialDialog = ({ open, onOpenChange }: AddMaterialDialogProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cover" className="text-sm font-medium">
-              Subir portada
+            <Label htmlFor="coverUrl" className="text-sm font-medium">
+              Link de portada (imagen en internet)
             </Label>
-            <div className="flex items-center gap-3">
-              <label
-                htmlFor="cover"
-                className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-xl cursor-pointer hover:bg-primary/20 transition-colors"
-              >
-                <Upload className="w-4 h-4" />
-                <span className="text-sm">
-                  {formData.cover ? formData.cover.name : "Seleccionar archivo"}
-                </span>
-              </label>
-              <Input
-                id="cover"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-            </div>
+            <Input
+              id="coverUrl"
+              value={formData.coverUrl}
+              onChange={(e) => setFormData({ ...formData, coverUrl: e.target.value })}
+              className="bg-primary/10 border-0 rounded-xl"
+              placeholder="https://..."
+            />
           </div>
 
           <div className="flex justify-center pt-4">

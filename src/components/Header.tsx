@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, LogOut, Shield, Loader2, BookMarked } from "lucide-react";
+import { BookOpen, LogOut, Shield, Loader2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
@@ -13,6 +13,9 @@ import { toast } from "sonner";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { clearToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
 const Header = () => {
   const navigate = useNavigate();
   const { data: user, isLoading } = useAuthUser();
@@ -24,6 +27,19 @@ const Header = () => {
       : user?.email?.split("@")[0] || "Invitado";
   const isAdmin = user?.rol === "admin";
   const isLogged = Boolean(user);
+
+  const { data: loans, isFetching: loadingLoans, isError: loansError } = useQuery({
+    queryKey: ["user-loans", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const res = await fetch(
+        `${API_BASE_URL}/prestamos/usuarios/${user.id}/historial`
+      );
+      if (!res.ok) throw new Error("No se pudieron cargar los préstamos");
+      return res.json();
+    },
+    enabled: Boolean(user?.id && menuOpen),
+  });
 
   const handleLogout = () => {
     clearToken();
@@ -89,10 +105,38 @@ const Header = () => {
               </DropdownMenuItem>
             )}
             {!isAdmin && (
-              <DropdownMenuItem onClick={() => navigate("/mis-prestamos")}>
-                <BookMarked className="mr-2 h-4 w-4" />
-                Mis préstamos
-              </DropdownMenuItem>
+              <div className="px-3 py-2 text-xs space-y-1">
+                <div className="text-muted-foreground font-semibold">Mis préstamos</div>
+                {loadingLoans && <div className="text-foreground">Cargando...</div>}
+                {loansError && <div className="text-destructive">No se pudieron cargar los préstamos</div>}
+                {!loadingLoans && !loansError && (() => {
+                  const list = Array.isArray(loans) ? loans : [];
+                  const activos = list.filter((p: any) => {
+                    const estado = p.estado && p.estado.value ? p.estado.value : p.estado;
+                    return estado === "activo" || estado === "ACTIVO";
+                  });
+                  if (activos.length === 0) {
+                    return <div className="text-muted-foreground">Sin préstamos activos</div>;
+                  }
+                  return (
+                    <div className="space-y-1">
+                      <div className="text-foreground font-semibold">
+                        Activos: {activos.length}
+                      </div>
+                      {activos.slice(0, 3).map((p: any) => {
+                        const fechaDev = p.fecha_devolucion_estimada
+                          ? String(p.fecha_devolucion_estimada).slice(0, 10)
+                          : "sin fecha";
+                        return (
+                          <div key={p.id || `${p.fecha_prestamo}-${fechaDev}`} className="text-foreground">
+                            • #{p.id ?? "?"} (dev: {fechaDev})
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
             )}
             <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
               <LogOut className="mr-2 h-4 w-4" />

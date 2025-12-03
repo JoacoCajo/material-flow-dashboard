@@ -38,6 +38,7 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
     summary: "",
     category: "",
     editorial: "",
+    coverUrl: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -52,6 +53,7 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
         summary: document.resumen || "",
         category: document.categoria || "",
         editorial: document.editorial || "",
+        coverUrl: document.link || "",
       });
     }
   }, [document]);
@@ -70,9 +72,10 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
             ? Number(formData.year)
             : undefined,
         edicion: formData.isbn || undefined,
-        categoria: formData.category || undefined,
+        categoria: formData.category ? formData.category.toLowerCase().trim() : undefined,
         resumen: formData.summary || undefined,
         editorial: formData.editorial || undefined,
+        link: formData.coverUrl || undefined,
       };
       if (formData.quantity && !Number.isNaN(Number(formData.quantity))) {
         payload.existencias = Number(formData.quantity);
@@ -173,15 +176,15 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
               className="w-full bg-primary/10 border-0 rounded-xl px-3 py-3 text-sm text-foreground"
             >
               <option value="">Sin categoría</option>
-              <option value="literatura_chilena">Literatura chilena</option>
-              <option value="tecnico_español">Técnico español</option>
-              <option value="novela">Novela</option>
-              <option value="ciencia_ficcion">Ciencia ficción</option>
-              <option value="historia">Historia</option>
-              <option value="infantil">Infantil</option>
-              <option value="accion">Acción</option>
-              <option value="guerra">Guerra</option>
-              <option value="romance">Romance</option>
+              <option value="Literatura chilena">Literatura chilena</option>
+              <option value="écnico español">Técnico español</option>
+              <option value="Novela">Novela</option>
+              <option value="Ciencia ficción">Ciencia ficción</option>
+              <option value="Historia">Historia</option>
+              <option value="Infantil">Infantil</option>
+              <option value="Acción">Acción</option>
+              <option value="Guerra">Guerra</option>
+              <option value="Romance">Romance</option>
             </select>
           </div>
 
@@ -235,6 +238,19 @@ const EditMaterialDialog = ({ open, onOpenChange, document, onUpdated }: EditMat
               onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
               className="w-full bg-primary/10 border-0 rounded-xl min-h-[150px] resize-none text-sm text-foreground px-3 py-2"
               placeholder="Añade un resumen breve"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-cover" className="text-sm font-medium">
+              Link de portada (imagen en internet)
+            </Label>
+            <Input
+              id="edit-cover"
+              value={formData.coverUrl}
+              onChange={(e) => setFormData({ ...formData, coverUrl: e.target.value })}
+              className="bg-primary/10 border-0 rounded-xl"
+              placeholder="https://..."
             />
           </div>
 

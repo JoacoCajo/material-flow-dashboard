@@ -18,6 +18,7 @@ const LoanRegistry = () => {
   const [loadingIsbn, setLoadingIsbn] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
+  const [isUserBlocked, setIsUserBlocked] = useState(false);
 
   const mapUserResponseToCard = (data: any): User => ({
     name: `${data.nombres ?? ""} ${data.apellidos ?? ""}`.trim() || data.email || "Usuario",
@@ -63,7 +64,12 @@ const LoanRegistry = () => {
       const data = await response.json();
       setUserData(mapUserResponseToCard(data));
       setUserId(data?.id ?? null);
-      toast.success("Usuario encontrado");
+      setIsUserBlocked(Boolean(data?.sancionado));
+      if (data?.sancionado) {
+        toast.error("El usuario tiene sanciones y no puede registrar nuevos préstamos");
+      } else {
+        toast.success("Usuario encontrado");
+      }
     } catch (error) {
       console.error("Error al buscar usuario por RUT", error);
       toast.error("No se pudo buscar el usuario. Intenta nuevamente.");
@@ -73,6 +79,10 @@ const LoanRegistry = () => {
   };
 
   const handleSearchIsbn = async () => {
+    if (isUserBlocked) {
+      toast.error("Usuario sancionado, no puede registrar préstamos");
+      return;
+    }
     if (!isbnInput.trim()) {
       toast.error("Ingresa un ISBN para continuar");
       return;
@@ -105,6 +115,14 @@ const LoanRegistry = () => {
   const handleSubmit = async () => {
     if (!userData || !bookData || userId === null) {
       toast.error("Busca primero el usuario y el material");
+      return;
+    }
+    if (!bookData.copies || bookData.copies <= 0) {
+      toast.error("No hay existencias disponibles");
+      return;
+    }
+    if (isUserBlocked) {
+      toast.error("Usuario sancionado, no puede registrar préstamos");
       return;
     }
 

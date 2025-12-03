@@ -24,6 +24,7 @@ type DocumentItem = {
   tipo?: string | null;
   tipo_medio?: string | null;
   existencias?: number | null;
+  link?: string | null;
   };
 
 const MaterialManagement = () => {
@@ -37,6 +38,11 @@ const MaterialManagement = () => {
   const { data: user } = useAuthUser();
   const isAdmin = user?.rol === "admin";
   const navigate = useNavigate();
+
+  const normalizeDoc = (doc: any): DocumentItem => ({
+    ...doc,
+    categoria: doc.categoria ? String(doc.categoria).toLowerCase() : null,
+  });
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
@@ -75,10 +81,15 @@ const MaterialManagement = () => {
         throw new Error("No se pudo buscar en el catálogo");
       }
       const data = await res.json();
-      setDocuments(Array.isArray(data?.items) ? data.items : []);
+      setDocuments(
+        Array.isArray(data?.items)
+          ? data.items.map((d: any) => normalizeDoc(d))
+          : []
+      );
     } catch (error) {
       console.error("Error en búsqueda", error);
-      toast.error("No se pudo realizar la búsqueda");
+      const msg = error instanceof Error ? error.message : "No se pudo realizar la búsqueda";
+      toast.error(msg);
     } finally {
       setLoadingDocs(false);
     }
@@ -97,7 +108,11 @@ const MaterialManagement = () => {
           throw new Error("No se pudieron obtener los documentos");
         }
         const data = await res.json();
-        setDocuments(Array.isArray(data?.items) ? data.items : []);
+        setDocuments(
+          Array.isArray(data?.items)
+            ? data.items.map((d: any) => normalizeDoc(d))
+            : []
+        );
       } catch (error) {
         console.error("Error al cargar documentos", error);
         toast.error("No se pudieron cargar los materiales");
@@ -119,7 +134,9 @@ const MaterialManagement = () => {
 
       const matchesCategory =
         selectedCategories.length === 0 ||
-        (doc.categoria ? selectedCategories.includes(doc.categoria) : false);
+        (doc.categoria
+          ? selectedCategories.includes(doc.categoria.toLowerCase())
+          : false);
 
       return matchesSearch && matchesCategory;
     });
@@ -232,7 +249,7 @@ const MaterialManagement = () => {
                       : "Sin resumen"
                   }
                   publisher={book.editorial || "Sin editorial"}
-                  coverImage={undefined}
+                  coverImage={book.link || undefined}
                   isSelected={selectedBookId === book.id}
                   onClick={() => handleBookSelect(book.id!)}
                 />

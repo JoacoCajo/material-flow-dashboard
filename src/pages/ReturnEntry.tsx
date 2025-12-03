@@ -61,14 +61,32 @@ const ReturnEntry = () => {
     phone: data.rol ? `Rol: ${data.rol}` : "",
     photo: data.foto_url || "https://placehold.co/96x96?text=User",
     recentLoans: [],
-    penalties: data.sancionado ? "Usuario sancionado" : "Sin sanciones",
-  });
+  penalties: data.sancionado ? "Usuario sancionado" : "Sin sanciones",
+});
 
-  const handleSearchRut = async () => {
-    if (!rutInput.trim()) {
-      toast.error("Ingresa un RUT para continuar");
-      return;
-    }
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8009/api/v1";
+
+const fetchActiveLoans = async (userId: number) => {
+  const res = await fetch(`${API_BASE_URL}/prestamos/usuarios/${userId}/historial`);
+  if (!res.ok) throw new Error("No se pudieron cargar los préstamos");
+  const data = await res.json();
+  if (!Array.isArray(data)) return [];
+  return data
+    .filter((p: any) => {
+      const estado = p.estado?.value ?? p.estado;
+      return estado === "activo" || estado === "ACTIVO";
+    })
+    .map(
+      (p: any) =>
+        `ISBN ${p.isbn_asociado || ""} (${p.fecha_devolucion_estimada ? String(p.fecha_devolucion_estimada).slice(0, 10) : "sin fecha"})`
+    );
+};
+
+const handleSearchRut = async () => {
+  if (!rutInput.trim()) {
+    toast.error("Ingresa un RUT para continuar");
+    return;
+  }
     setLoadingUser(true);
     try {
       const res = await fetch(
@@ -77,14 +95,21 @@ const ReturnEntry = () => {
       if (!res.ok) {
         setUserData(null);
         throw new Error("No se encontró un usuario con ese RUT");
-      }
-      const data = await res.json();
-      setUserData(mapUserResponseToCard(data));
-      toast.success("Usuario encontrado");
-    } catch (error) {
-      console.error(error);
-      const msg = error instanceof Error ? error.message : "Error al buscar usuario";
-      toast.error(msg);
+    }
+    const data = await res.json();
+    const mappedUser = mapUserResponseToCard(data);
+    try {
+      const activos = await fetchActiveLoans(data.id);
+      mappedUser.recentLoans = activos;
+    } catch (err) {
+      console.error("Error cargando prestamos activos", err);
+    }
+    setUserData(mappedUser);
+    toast.success("Usuario encontrado");
+  } catch (error) {
+    console.error(error);
+    const msg = error instanceof Error ? error.message : "Error al buscar usuario";
+    toast.error(msg);
     } finally {
       setLoadingUser(false);
     }
@@ -116,7 +141,7 @@ const ReturnEntry = () => {
         bookAuthor: data.autor ?? "Autor desconocido",
         bookYear: data.anio ?? new Date().getFullYear(),
         bookGenre: data.categoria ?? "Sin categoría",
-        bookCover: "https://placehold.co/128x180?text=Libro",
+        bookCover: data.link || "https://placehold.co/128x180?text=Libro",
         copies: data.existencias ?? 0,
         userName: userData?.name ?? "",
         userRut: userData?.rut ?? "",
@@ -271,7 +296,7 @@ const ReturnEntry = () => {
                   />
                   <div className="flex-1 bg-amber-200 rounded p-3 space-y-1">
                     <h4 className="font-semibold text-foreground text-sm">
-                      Últimos prestamos
+                      Préstamos activos
                     </h4>
                     {userData.recentLoans.map((loan, index) => (
                       <p key={index} className="text-xs text-foreground">

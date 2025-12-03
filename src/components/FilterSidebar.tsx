@@ -8,36 +8,44 @@ interface FilterSidebarProps {
 
 const FilterSidebar = ({ selectedCategories, onCategoryChange }: FilterSidebarProps) => {
   const categories = [
-    "literatura_chilena",
-    "tecnico_español",
-    "novela",
-    "ciencia_ficcion",
-    "historia",
-    "infantil",
-    "accion",
-    "guerra",
-    "romance",
+    { value: "literatura_chilena", label: "Literatura chilena" },
+    { value: "tecnico_español", label: "Técnico español" },
+    { value: "novela", label: "Novela" },
+    { value: "ciencia_ficcion", label: "Ciencia ficción" },
+    { value: "historia", label: "Historia" },
+    { value: "infantil", label: "Infantil" },
+    { value: "accion", label: "Acción" },
+    { value: "guerra", label: "Guerra" },
+    { value: "romance", label: "Romance" },
   ];
 
   return (
-    <div className="bg-card rounded-2xl p-6 shadow-sm">
-      <h3 className="font-semibold text-foreground mb-4">Filtros de Búsqueda</h3>
+    <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+      <h3 className="font-semibold text-foreground mb-3">Filtros de búsqueda</h3>
+      <p className="text-xs text-muted-foreground mb-4">
+        Selecciona una o más categorías para acotar los resultados.
+      </p>
       <div className="space-y-3">
         {categories.map((category) => (
-          <div key={category} className="flex items-center space-x-3">
+          <label
+            key={category.value}
+            className="flex items-center gap-3 cursor-pointer hover:bg-muted/40 rounded-lg px-2 py-1.5 transition-colors"
+          >
             <Checkbox
-              id={category}
-              checked={selectedCategories.includes(category)}
-              onCheckedChange={() => onCategoryChange(category)}
-              className="border-2"
+              id={category.value}
+              checked={selectedCategories.includes(category.value)}
+              onCheckedChange={() => onCategoryChange(category.value)}
+              className="border-2 data-[state=checked]:border-primary data-[state=checked]:bg-primary"
             />
-            <Label
-              htmlFor={category}
-              className="text-sm font-medium cursor-pointer text-foreground"
-            >
-              {category}
-            </Label>
-          </div>
+            <div className="flex-1">
+              <Label
+                htmlFor={category.value}
+                className="text-sm font-medium text-foreground leading-tight"
+              >
+                {category.label}
+              </Label>
+            </div>
+          </label>
         ))}
       </div>
     </div>
